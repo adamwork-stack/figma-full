@@ -9,6 +9,10 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { EventsModule } from './modules/events/events.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { UsersModule } from './modules/users/users.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { EventsModule } from './modules/events/events.module';
     }),
     AuthModule,
     EventsModule,
+    TicketsModule,
+    PaymentsModule,
+    UsersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -38,4 +46,8 @@ import { EventsModule } from './modules/events/events.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
+  }
+}

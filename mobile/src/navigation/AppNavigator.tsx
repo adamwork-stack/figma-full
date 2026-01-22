@@ -8,6 +8,13 @@ import {SignUpScreen} from '../screens/auth/SignUpScreen';
 import {ForgotPasswordScreen} from '../screens/auth/ForgotPasswordScreen';
 import {EventListScreen} from '../screens/events/EventListScreen';
 import {EventDetailScreen} from '../screens/events/EventDetailScreen';
+import {TicketListScreen} from '../screens/tickets/TicketListScreen';
+import {TicketDetailScreen} from '../screens/tickets/TicketDetailScreen';
+import {CheckoutScreen} from '../screens/tickets/CheckoutScreen';
+import {ProfileScreen} from '../screens/profile/ProfileScreen';
+import {EditProfileScreen} from '../screens/profile/EditProfileScreen';
+import {SettingsScreen} from '../screens/profile/SettingsScreen';
+import {NotificationsScreen} from '../screens/notifications/NotificationsScreen';
 import {loadUserFromStorage} from '../store/slices/authSlice';
 import {RootState, AppDispatch} from '../store/store';
 import {Typography} from '../components';
@@ -39,6 +46,72 @@ const AuthStack = () => {
   );
 };
 
+const EventsStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="EventList"
+        component={EventListScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetailScreen}
+        options={{title: 'Event Details'}}
+      />
+      <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+        options={{title: 'Checkout'}}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const TicketsStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TicketList"
+        component={TicketListScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="TicketDetail"
+        component={TicketDetailScreen}
+        options={{title: 'Ticket Details'}}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ProfileStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{title: 'Edit Profile'}}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{title: 'Settings'}}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{title: 'Notifications'}}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const MainTabs = () => {
   return (
     <Tab.Navigator
@@ -48,9 +121,9 @@ const MainTabs = () => {
         tabBarInactiveTintColor: '#666666',
       }}>
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Events" component={EventsScreen} />
-      <Tab.Screen name="Tickets" component={TicketsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Events" component={EventsStack} />
+      <Tab.Screen name="Tickets" component={TicketsStack} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 };
