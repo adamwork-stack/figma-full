@@ -15,65 +15,223 @@ figma-full/
 └── [documentation files]
 ```
 
-## Quick Start
+## How to Run This Project
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
-- PostgreSQL 15+
-- Redis (for caching)
-- React Native development environment:
-  - iOS: Xcode (macOS only)
-  - Android: Android Studio
-- AWS account (for production deployment)
+- **Node.js 18+** ([Download](https://nodejs.org/))
+- **Docker Desktop** ([Download](https://www.docker.com/products/docker-desktop)) - For PostgreSQL and Redis
+- **React Native development environment:**
+  - **iOS**: Xcode (macOS only) - [Download](https://developer.apple.com/xcode/)
+  - **Android**: Android Studio - [Download](https://developer.android.com/studio)
 
-### Installation
+### Step-by-Step Setup
 
-1. **Clone the repository**
+#### 1. Install Dependencies
+
+```bash
+# Install all dependencies (root, backend, and mobile)
+npm run install:all
+
+# Or install manually:
+npm install
+cd backend && npm install
+cd ../mobile && npm install
+
+# For iOS (macOS only):
+cd mobile/ios && pod install && cd ../..
+```
+
+#### 2. Set Up Environment Variables
+
+**Backend Environment (`backend/.env`):**
+
+Create `backend/.env` file with:
+
+```env
+NODE_ENV=development
+PORT=3000
+API_VERSION=v1
+
+# Database
+DATABASE_URL=postgresql://fastivalle:fastivalle@localhost:5432/fastivalle
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=fastivalle
+DB_PASSWORD=fastivalle
+DB_DATABASE=fastivalle
+
+# Redis
+REDIS_URL=redis://localhost:6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT Secrets (generate strong random strings)
+JWT_SECRET=your-super-secret-jwt-key-change-this-min-32-chars
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_SECRET=your-super-secret-refresh-token-key-change-this-min-32-chars
+REFRESH_TOKEN_EXPIRES_IN=7d
+
+# CORS
+CORS_ORIGIN=http://localhost:3000
+
+# Optional (for full functionality):
+# STRIPE_SECRET_KEY=sk_test_...
+# FIREBASE_PROJECT_ID=...
+# SENDGRID_API_KEY=...
+# SENTRY_DSN=...
+```
+
+**Mobile Environment (`mobile/.env`):**
+
+Create `mobile/.env` file with:
+
+```env
+API_BASE_URL=http://localhost:3000
+API_VERSION=v1
+ENVIRONMENT=development
+
+# For iOS Simulator: use http://localhost:3000
+# For Android Emulator: use http://10.0.2.2:3000
+# For Physical Device: use your computer's IP (e.g., http://192.168.1.100:3000)
+```
+
+#### 3. Start Database Services
+
+```bash
+# Start PostgreSQL and Redis using Docker
+docker-compose up -d
+
+# Verify containers are running
+docker-compose ps
+
+# Check logs if needed
+docker-compose logs -f
+```
+
+#### 4. Run Database Migrations
+
+```bash
+cd backend
+
+# Run migrations to create database tables
+npm run migration:run
+
+# Verify database connection
+# You can test with: psql -h localhost -U fastivalle -d fastivalle
+```
+
+#### 5. Start Backend API
+
+**Terminal 1:**
+
+```bash
+# From project root
+npm run backend:dev
+
+# Or manually:
+cd backend
+npm run start:dev
+```
+
+Backend will be available at:
+- API: http://localhost:3000
+- Swagger Docs: http://localhost:3000/api/docs
+- Health Check: http://localhost:3000/api/v1/health
+
+#### 6. Start Mobile App
+
+**Terminal 2 (for iOS - macOS only):**
+
+```bash
+# Start Metro bundler
+cd mobile
+npm start
+
+# In another terminal, run iOS app:
+npm run ios
+
+# Or from project root:
+npm run mobile:ios
+```
+
+**Terminal 2 (for Android):**
+
+```bash
+# Start Metro bundler
+cd mobile
+npm start
+
+# In another terminal, run Android app:
+npm run android
+
+# Or from project root:
+npm run mobile:android
+```
+
+### Verify Everything Works
+
+1. **Backend Health Check:**
    ```bash
-   git clone <repository-url>
-   cd figma-full
+   curl http://localhost:3000/api/v1/health
    ```
+   Should return: `{"status":"ok","timestamp":"..."}`
 
-2. **Install dependencies**
-   ```bash
-   npm run install:all
-   ```
+2. **Mobile App:**
+   - App should launch on simulator/emulator
+   - Should connect to backend API
+   - No errors in console
 
-3. **Set up environment variables**
-   - Copy `.env.example` files in `mobile/` and `backend/`
-   - Configure your environment variables
+### Troubleshooting
 
-4. **Set up database**
-   ```bash
-   # Start PostgreSQL and Redis (using Docker)
-   docker-compose up -d
-   
-   # Run migrations
-   cd backend
-   npm run migration:run
-   ```
+**Backend won't start:**
+- Check if port 3000 is available
+- Verify database is running: `docker-compose ps`
+- Check `.env` file exists and has correct values
 
-5. **Start development servers**
-   ```bash
-   # Terminal 1: Start backend API
-   npm run backend:dev
-   
-   # Terminal 2: Start mobile app (iOS)
-   npm run mobile:ios
-   
-   # Or for Android
-   npm run mobile:android
-   ```
+**Mobile can't connect to backend:**
+- **iOS Simulator**: Use `http://localhost:3000`
+- **Android Emulator**: Use `http://10.0.2.2:3000`
+- **Physical Device**: Use your computer's IP address (find with `ipconfig` on Windows or `ifconfig` on Mac/Linux)
 
-## Documentation
+**Database connection failed:**
+- Ensure Docker containers are running: `docker-compose ps`
+- Check database credentials in `backend/.env`
+- Try restarting containers: `docker-compose restart`
 
-- [Technical Proposal](TECHNICAL_PROPOSAL.md) - Complete technical approach
-- [System Architecture](SYSTEM_ARCHITECTURE.md) - Architecture diagrams and design
-- [API Specification](API_SPECIFICATION.md) - API endpoint documentation
-- [Database Schema](DATABASE_SCHEMA.md) - Database design
-- [Requirements Specification](REQUIREMENTS_SPECIFICATION.md) - Functional requirements
-- [Project Structure](PROJECT_STRUCTURE.md) - Code organization guide
+**Migration errors:**
+- Ensure database exists: `docker-compose up -d`
+- Check database connection string in `.env`
+- Verify TypeORM configuration
+
+### Available Commands
+
+**Root level:**
+```bash
+npm run install:all      # Install all dependencies
+npm run backend:dev      # Start backend in development
+npm run mobile:ios       # Run iOS app
+npm run mobile:android   # Run Android app
+npm test                 # Run all tests
+```
+
+**Backend (`cd backend`):**
+```bash
+npm run start:dev        # Start development server
+npm run build            # Build for production
+npm run migration:run   # Run database migrations
+npm run migration:generate -- src/database/migrations/MigrationName  # Generate migration
+npm test                 # Run tests
+```
+
+**Mobile (`cd mobile`):**
+```bash
+npm start                # Start Metro bundler
+npm run ios              # Run iOS app
+npm run android          # Run Android app
+npm test                 # Run tests
+```
+
 
 ## Technology Stack
 
