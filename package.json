@@ -1,0 +1,30 @@
+{
+  "name": "fastivalle",
+  "version": "1.0.0",
+  "description": "Fastivalle mobile application - Event discovery and ticket purchasing platform",
+  "private": true,
+  "workspaces": [
+    "mobile",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd mobile && npm install && cd ../backend && npm install",
+    "mobile:ios": "cd mobile && npm run ios",
+    "mobile:android": "cd mobile && npm run android",
+    "backend:dev": "cd backend && npm run start:dev",
+    "backend:build": "cd backend && npm run build",
+    "test": "npm run test --workspaces"
+  },
+  "keywords": [
+    "events",
+    "tickets",
+    "mobile-app",
+    "react-native"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
