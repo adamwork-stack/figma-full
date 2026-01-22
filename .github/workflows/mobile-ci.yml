@@ -1,0 +1,99 @@
+name: Mobile CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'mobile/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'mobile/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./mobile
+        run: npm ci
+
+      - name: Run linter
+        working-directory: ./mobile
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: ./mobile
+        run: npm test
+
+      - name: Type check
+        working-directory: ./mobile
+        run: npm run type-check
+
+  # iOS build (macOS only)
+  build-ios:
+    needs: test
+    runs-on: macos-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./mobile
+        run: npm ci
+
+      - name: Install CocoaPods
+        working-directory: ./mobile/ios
+        run: pod install
+
+      - name: Build iOS
+        working-directory: ./mobile
+        run: |
+          # Build iOS app
+          # Add Fastlane or xcodebuild commands here
+
+  # Android build
+  build-android:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        working-directory: ./mobile
+        run: npm ci
+
+      - name: Build Android
+        working-directory: ./mobile/android
+        run: |
+          # Build Android app
+          # Add Gradle build commands here
